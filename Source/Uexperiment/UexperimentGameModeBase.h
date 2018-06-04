@@ -15,6 +15,12 @@ class UEXPERIMENT_API AUexperimentGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 	
 	
-	
-	
+public:
+	AUexperimentGameModeBase();
+
+	UPROPERTY(EditAnywhere)
+	float WorldBounds;
+
+	UPROPERTY(EditAnywhere)
+	float BulletVelecoty;
 };

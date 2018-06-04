@@ -41,15 +41,19 @@ public:
 	UPROPERTY(Category="Tweaks", EditAnywhere)
 	float Drag;
 
+	UPROPERTY(Category="Tweaks", EditAnywhere)
+	float ShotCoolDown;
+
 	//Input functions
 	void Move_XAxis(float AxisValue);
 	void Move_YAxis(float AxisValue);
+	void Shoot_XAxis(float AxisValue);
+	void Shoot_YAxis(float AxisValue);
 	void CameraZoom(float AxisValue);
-	void StartGrowing();
-	void StopGrowing();
 
 	//Input variables
 	FVector CurrentAcceleration;
 	FVector CurrentVelocity;
-	bool bGrowing;
+	FVector ShotDirection;
+	float ShotTime;
 };
