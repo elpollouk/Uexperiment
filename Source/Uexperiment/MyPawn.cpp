@@ -7,11 +7,15 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
-#define PLAYER_ACCELERATION 200.0f
 #define CAMERA_DISTANCE 800.0f
+#define CAMERA_ZOOMOUT_DISTANCE 1600.0f
 
 // Sets default values
-AMyPawn::AMyPawn()
+AMyPawn::AMyPawn() :
+	Acceleration(150.0f),
+	Drag(0.9f),
+	CurrentAcceleration(0.0f),
+	CurrentVelocity(0.0f)
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -24,15 +28,15 @@ AMyPawn::AMyPawn()
 	OurVisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("OurVisibleComponent"));
 	OurVisibleComponent->SetupAttachment(sphere);
 
-	auto springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraAttachmentArm"));
-	springArm->SetupAttachment(RootComponent);
-	springArm->RelativeRotation = FRotator(-45.0f, 0.0f, 0.0f);
-	springArm->TargetArmLength = CAMERA_DISTANCE;
-	springArm->bEnableCameraLag = true;
-	springArm->CameraLagSpeed = 3.0f;
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraAttachmentArm"));
+	SpringArm->SetupAttachment(RootComponent);
+	SpringArm->RelativeRotation = FRotator(-45.0f, 0.0f, 0.0f);
+	SpringArm->TargetArmLength = CAMERA_DISTANCE;
+	SpringArm->bEnableCameraLag = true;
+	SpringArm->CameraLagSpeed = 10.0f;
 
 	auto camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	camera->SetupAttachment(springArm, USpringArmComponent::SocketName);
+	camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 }
 
 // Called when the game starts or when spawned
@@ -67,7 +71,10 @@ void AMyPawn::Tick(float DeltaTime)
 
 	// Handle movement based on our "MoveX" and "MoveY" axes
 	{
-		if (!CurrentVelocity.IsZero())
+		CurrentVelocity += CurrentAcceleration;
+		CurrentVelocity *= Drag;
+
+		if (!CurrentVelocity.IsNearlyZero())
 		{
 			FVector NewLocation = GetActorLocation() + (CurrentVelocity * DeltaTime);
 			SetActorLocation(NewLocation);
@@ -87,18 +94,23 @@ void AMyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	// Respond every frame to the values of our two movement axes, "MoveX" and "MoveY".
 	PlayerInputComponent->BindAxis("MoveX", this, &AMyPawn::Move_XAxis);
 	PlayerInputComponent->BindAxis("MoveY", this, &AMyPawn::Move_YAxis);
+	PlayerInputComponent->BindAxis("CameraZoom", this, &AMyPawn::CameraZoom);
 }
 
 void AMyPawn::Move_XAxis(float AxisValue)
 {
-	// Move at 100 units per second forward or backward
-	CurrentVelocity.X = FMath::Clamp(AxisValue, -1.0f, 1.0f) * PLAYER_ACCELERATION;
+	CurrentAcceleration.X = FMath::Clamp(AxisValue, -1.0f, 1.0f) * Acceleration;
 }
 
 void AMyPawn::Move_YAxis(float AxisValue)
 {
-	// Move at 100 units per second right or left
-	CurrentVelocity.Y = FMath::Clamp(AxisValue, -1.0f, 1.0f) * PLAYER_ACCELERATION;
+	CurrentAcceleration.Y = FMath::Clamp(AxisValue, -1.0f, 1.0f) * Acceleration;
+}
+
+void AMyPawn::CameraZoom(float AxisValue)
+{
+	auto zoominess = (CAMERA_ZOOMOUT_DISTANCE - CAMERA_DISTANCE) * AxisValue;
+	SpringArm->TargetArmLength = CAMERA_DISTANCE + zoominess;
 }
 
 void AMyPawn::StartGrowing()
