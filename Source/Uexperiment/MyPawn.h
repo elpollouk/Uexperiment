@@ -28,7 +28,7 @@ public:
 
 	
 	UPROPERTY(EditAnywhere)
-	USceneComponent* OurVisibleComponent;
+	UStaticMeshComponent* OurVisibleComponent;
 
 	//Input functions
 	void Move_XAxis(float AxisValue);

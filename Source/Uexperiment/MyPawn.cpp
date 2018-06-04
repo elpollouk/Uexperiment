@@ -3,7 +3,12 @@
 #include "MyPawn.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/SphereComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
+#define PLAYER_ACCELERATION 200.0f
+#define CAMERA_DISTANCE 800.0f
 
 // Sets default values
 AMyPawn::AMyPawn()
@@ -13,16 +18,21 @@ AMyPawn::AMyPawn()
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
-	// Create a dummy root component we can attach things to.
-	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
-	// Create a camera and a visible object
-	UCameraComponent* OurCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("OurCamera"));
+	auto sphere = CreateDefaultSubobject<USphereComponent>(TEXT("RootComponent"));
+	RootComponent = sphere;
+
 	OurVisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("OurVisibleComponent"));
-	// Attach our camera and visible object to our root component. Offset and rotate the camera.
-	OurCamera->SetupAttachment(RootComponent);
-	OurCamera->SetRelativeLocation(FVector(-250.0f, 0.0f, 250.0f));
-	OurCamera->SetRelativeRotation(FRotator(-45.0f, 0.0f, 0.0f));
-	OurVisibleComponent->SetupAttachment(RootComponent);
+	OurVisibleComponent->SetupAttachment(sphere);
+
+	auto springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraAttachmentArm"));
+	springArm->SetupAttachment(RootComponent);
+	springArm->RelativeRotation = FRotator(-45.0f, 0.0f, 0.0f);
+	springArm->TargetArmLength = CAMERA_DISTANCE;
+	springArm->bEnableCameraLag = true;
+	springArm->CameraLagSpeed = 3.0f;
+
+	auto camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	camera->SetupAttachment(springArm, USpringArmComponent::SocketName);
 }
 
 // Called when the game starts or when spawned
@@ -82,13 +92,13 @@ void AMyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void AMyPawn::Move_XAxis(float AxisValue)
 {
 	// Move at 100 units per second forward or backward
-	CurrentVelocity.X = FMath::Clamp(AxisValue, -1.0f, 1.0f) * 100.0f;
+	CurrentVelocity.X = FMath::Clamp(AxisValue, -1.0f, 1.0f) * PLAYER_ACCELERATION;
 }
 
 void AMyPawn::Move_YAxis(float AxisValue)
 {
 	// Move at 100 units per second right or left
-	CurrentVelocity.Y = FMath::Clamp(AxisValue, -1.0f, 1.0f) * 100.0f;
+	CurrentVelocity.Y = FMath::Clamp(AxisValue, -1.0f, 1.0f) * PLAYER_ACCELERATION;
 }
 
 void AMyPawn::StartGrowing()
