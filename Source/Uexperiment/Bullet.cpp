@@ -28,6 +28,12 @@ ABullet::ABullet()
 		visual->SetStaticMesh(visualAsset.Object);
 		visual->SetWorldScale3D(FVector(BULLET_RADIUS / 50.0f));
 	}
+
+	static ConstructorHelpers::FObjectFinder<UMaterial> materialAssert(TEXT("/Game/BulletMat.BulletMat"));
+	if (materialAssert.Succeeded())
+	{
+		visual->OverrideMaterials.Add(materialAssert.Object);
+	}
 }
 
 // Called when the game starts or when spawned
