@@ -6,6 +6,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "UexperimentGameModeBase.h"
+#include "Enemy.h"
 
 #define BULLET_RADIUS 20.0f
 
@@ -34,6 +35,9 @@ ABullet::ABullet()
 	{
 		visual->OverrideMaterials.Add(materialAssert.Object);
 	}
+
+	sphere->bGenerateOverlapEvents = true;
+	sphere->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnHit);
 }
 
 // Called when the game starts or when spawned
@@ -68,5 +72,18 @@ void ABullet::Init(const FVector& direction)
 	Velocity = direction;
 	Velocity.Normalize();
 	Velocity *= gameMode->BulletVelecoty;
+
+	auto pos = GetActorLocation();
+	pos.Z = 30.0f;
+	SetActorLocation(pos);
 }
 
+void ABullet::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->GetClass()->IsChildOf(AEnemy::StaticClass()))
+	{
+		auto world = GetWorld();
+		world->DestroyActor(OtherActor);
+		world->DestroyActor(this);
+	}
+}

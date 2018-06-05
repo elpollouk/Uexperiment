@@ -64,7 +64,8 @@ void AMyPawn::Tick(float DeltaTime)
 		FActorSpawnParameters params;
 		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		auto bullet = GetWorld()->SpawnActor<ABullet>(GetActorLocation(), FRotator::ZeroRotator, params);
-		bullet->Init(ShotDirection);
+		if (bullet) // A bullet can trigger a hit and removal instantly, giving us a null actor
+			bullet->Init(ShotDirection);
 		ShotTime = ShotCoolDown;
 	}
 	ShotTime -= DeltaTime;
