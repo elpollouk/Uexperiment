@@ -21,7 +21,7 @@ AEnemy::AEnemy()
 
 	UStaticMeshComponent* visual = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualRepresentation"));
 	visual->SetupAttachment(RootComponent);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> visualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Cylinder.Shape_Cylinder"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> visualAsset(TEXT("/Game/StarterContent/Shapes/Shape_WideCapsule.Shape_WideCapsule"));
 	if (visualAsset.Succeeded())
 	{
 		visual->SetStaticMesh(visualAsset.Object);
