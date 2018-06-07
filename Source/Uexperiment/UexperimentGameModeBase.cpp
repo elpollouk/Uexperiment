@@ -11,7 +11,8 @@ AUexperimentGameModeBase::AUexperimentGameModeBase() :
 	BulletVelecoty(2500.0f),
 	EnemySpawnTime(3.0f),
 	InitialEnemySpawnTime(5.0f),
-	EnemySpeed(300.0f),
+	EnemySpeedMin(300.0f),
+	EnemySpeedMax(600.0f),
 	EnemyMinSpawnDistance(400.0f)
 {
 	PrimaryActorTick.bCanEverTick = true;

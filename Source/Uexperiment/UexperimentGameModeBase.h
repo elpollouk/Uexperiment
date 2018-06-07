@@ -39,7 +39,10 @@ public:
 	float InitialEnemySpawnTime;
 
 	UPROPERTY(Category=Enemy, EditAnywhere)
-	float EnemySpeed;
+	float EnemySpeedMin;
+
+	UPROPERTY(Category = Enemy, EditAnywhere)
+	float EnemySpeedMax;
 
 	UPROPERTY(Category=Enemy, EditAnywhere)
 	float EnemyMinSpawnDistance;

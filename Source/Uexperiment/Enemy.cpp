@@ -38,7 +38,8 @@ AEnemy::AEnemy()
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	auto gameMode = (AUexperimentGameModeBase*)GetWorld()->GetAuthGameMode();
+	_Velocity = FMath::RandRange(gameMode->EnemySpeedMin, gameMode->EnemySpeedMax);
 }
 
 // Called every frame
@@ -50,7 +51,7 @@ void AEnemy::Tick(float DeltaTime)
 	auto player = gameMode->GetPlayer();
 	auto vectorToPlayer = player->GetActorLocation() - GetActorLocation();
 	vectorToPlayer.Normalize();
-	vectorToPlayer *= (DeltaTime * gameMode->EnemySpeed);
+	vectorToPlayer *= (DeltaTime * _Velocity);
 
 	SetActorLocation(GetActorLocation() + vectorToPlayer);
 }
