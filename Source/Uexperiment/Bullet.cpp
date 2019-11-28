@@ -36,7 +36,7 @@ ABullet::ABullet()
 		visual->OverrideMaterials.Add(materialAssert.Object);
 	}
 
-	sphere->bGenerateOverlapEvents = true;
+	sphere->SetGenerateOverlapEvents(true);
 	sphere->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnHit);
 }
 

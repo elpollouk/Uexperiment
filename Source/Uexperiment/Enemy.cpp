@@ -15,7 +15,7 @@ AEnemy::AEnemy()
 	PrimaryActorTick.bCanEverTick = true;
 
 	USphereComponent* root = CreateDefaultSubobject<USphereComponent>(TEXT("RootComponent"));
-	root->bGenerateOverlapEvents = true;
+	root->SetGenerateOverlapEvents(true);
 	RootComponent = root;
 	root->SetCollisionProfileName(TEXT("Enemy"));
 
